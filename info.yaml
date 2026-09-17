@@ -1,8 +1,5 @@
 # Tiny Tapeout project information file
-# NOTE: merge this with whatever info.yaml the `tt` project template already
-# generated in your repo (field names/schema can shift between TT releases) --
-# don't just blindly overwrite it. Check https://tinytapeout.com/hdl/config/
-# for the current schema.
+yaml_version: 6
 
 project:
   title:        "nanoPIO"
@@ -66,34 +63,31 @@ external_hw: ""
 
 pinout:
   # Inputs
-  ui_in:
-    - "PIO in[0] / WAIT PIN 0 source"
-    - "PIO in[1] / WAIT PIN 1 source"
-    - "PIO in[2] / WAIT PIN 2 source"
-    - "PIO in[3] / WAIT PIN 3 source"
-    - "PIO in[4] / WAIT PIN 4 source"
-    - "LOAD_DATA (reprogramming serial data in)"
-    - "LOAD_CLK (reprogramming bit clock)"
-    - "LOAD_EN (1 = reprogramming mode, core halted)"
+  ui[0]: "PIO in[0] / WAIT PIN 0 source"
+  ui[1]: "PIO in[1] / WAIT PIN 1 source"
+  ui[2]: "PIO in[2] / WAIT PIN 2 source"
+  ui[3]: "PIO in[3] / WAIT PIN 3 source"
+  ui[4]: "PIO in[4] / WAIT PIN 4 source"
+  ui[5]: "LOAD_DATA (reprogramming serial data in)"
+  ui[6]: "LOAD_CLK (reprogramming bit clock)"
+  ui[7]: "LOAD_EN (1 = reprogramming mode, core halted)"
 
   # Outputs
-  uo_out:
-    - "PIO out[0]"
-    - "PIO out[1]"
-    - "PIO out[2]"
-    - "PIO out[3]"
-    - "PIO out[4]"
-    - "PIO out[5]"
-    - "PIO out[6]"
-    - "PIO out[7]"
+  uo[0]: "PIO out[0]"
+  uo[1]: "PIO out[1]"
+  uo[2]: "PIO out[2]"
+  uo[3]: "PIO out[3]"
+  uo[4]: "PIO out[4]"
+  uo[5]: "PIO out[5]"
+  uo[6]: "PIO out[6]"
+  uo[7]: "PIO out[7]"
 
   # Bidirectional pins (driven as outputs only in v1)
-  uio:
-    - "PIO out[8] (uio, output only)"
-    - "PIO out[9] (uio, output only)"
-    - "PIO out[10] (uio, output only)"
-    - "PIO out[11] (uio, output only)"
-    - "PIO out[12] (uio, output only)"
-    - "PIO out[13] (uio, output only)"
-    - "PIO out[14] (uio, output only)"
-    - "PIO out[15] (uio, output only)"
+  uio[0]: "PIO out[8] (uio, output only)"
+  uio[1]: "PIO out[9] (uio, output only)"
+  uio[2]: "PIO out[10] (uio, output only)"
+  uio[3]: "PIO out[11] (uio, output only)"
+  uio[4]: "PIO out[12] (uio, output only)"
+  uio[5]: "PIO out[13] (uio, output only)"
+  uio[6]: "PIO out[14] (uio, output only)"
+  uio[7]: "PIO out[15] (uio, output only)"
