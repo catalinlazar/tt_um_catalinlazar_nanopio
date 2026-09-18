@@ -5,7 +5,7 @@ project:
   title:        "nanoPIO"
   author:       "catalinlazar"
   discord:      ""
-  description:  "A tiny bit-banged programmable I/O engine (RP2040 PIO-inspired) with a reprogrammable 32-word instruction store, used to emulate UART/SPI/I2C timing."
+  description:  "A tiny bit-banged programmable I/O engine (RP2040 PIO-inspired) with a reprogrammable 16-word instruction store, used to emulate UART/SPI/I2C timing."
   language:     "Verilog"
   clock_hz:     10000000
 
@@ -26,8 +26,9 @@ project:
 # How the project works. See docs/info.md for the long-form writeup.
 how_it_works: |
   nanoPIO is a tiny Harvard-architecture engine that executes a 5-instruction
-  ISA (JMP / WAIT / IN / OUT / SET) out of a 32-word, 13-bit-wide instruction
-  memory made of flip-flops so it can be reprogrammed after fabrication.
+  ISA (JMP / WAIT / IN / OUT / SET) out of a 16-word, 13-bit-wide instruction
+  memory made of per-word latches (gated by a shared write-address decoder)
+  so it can be reprogrammed after fabrication.
 
   Instructions operate on one 8-bit scratch register X and a program counter:
     SET X, imm7        X <= imm7
@@ -41,7 +42,7 @@ how_it_works: |
   encoded directly in the program without extra NOP instructions.
 
   The chip is reprogrammed by holding ui_in[7] (LOAD_EN) high and bit-banging
-  18-bit frames (5-bit address + 13-bit instruction, MSB first) into
+  17-bit frames (4-bit address + 13-bit instruction, MSB first) into
   ui_in[5] (LOAD_DATA), clocked by ui_in[6] (LOAD_CLK). Execution starts from
   address 0 as soon as LOAD_EN is released.
 

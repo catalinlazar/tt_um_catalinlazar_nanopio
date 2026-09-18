@@ -6,7 +6,7 @@
 // program counter, and a per-instruction delay counter. See
 // nanopio_defs.vh for the instruction encoding.
 module nanopio_core #(
-    parameter AWIDTH = 5
+    parameter AWIDTH = 4
 ) (
     input  wire              clk,
     input  wire              rst_n,

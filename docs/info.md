@@ -1,6 +1,6 @@
 # nanoPIO — how it works
 
-## Instruction word (13 bits, 32-word program store)
+## Instruction word (13 bits, 16-word program store)
 
 ```
 [12:10] opcode
@@ -10,7 +10,7 @@
 
 | opcode (3b) | mnemonic | operand layout                  | effect |
 |---|---|---|---|
-| 000 | JMP  | `[6:5]=cond [4:0]=addr`         | `PC <= addr` if cond true, else `PC+1` |
+| 000 | JMP  | `[6:5]=cond [3:0]=addr`         | `PC <= addr` if cond true, else `PC+1` |
 | 001 | WAIT | `[6]=pol [2:0]=pin idx`         | stall (no PC advance) until `ui_in[idx] == pol` |
 | 010 | IN   | unused                          | `X <= ui_in` |
 | 011 | OUT  | `[6]=dest (0=uo_out,1=uio_out)` | `dest <= X` |
@@ -37,11 +37,11 @@ extra stall cycles after it executes. This lets protocol timing — a UART bit
 period, an SPI/I2C clock half-period — be encoded directly into the program
 instead of burning instruction words on busy-loops. This mirrors how RP2040
 PIO folds `[delay]` into every instruction rather than giving it its own
-opcode, which matters a lot when the whole program store is only 32 words.
+opcode, which matters a lot when the whole program store is only 16 words.
 
 ## Registers
 
-- **PC** — 5 bits, indexes the 32-word instruction memory
+- **PC** — 4 bits, indexes the 16-word instruction memory
 - **X** — 8-bit scratch/loop-counter register. No separate ISR/OSR shift
   registers like real PIO has: `IN` writes straight into `X`, `OUT` drives
   straight out of `X`. This is the single biggest area saving relative to
@@ -65,15 +65,18 @@ restructured using the `delay` field instead of an inner loop.
 
 ## Reprogramming (bit-bang loader)
 
-The instruction memory is built from flip-flops (not a synthesized ROM) so
-it can be rewritten after fabrication. To load a program:
+The instruction memory is built from per-word latches gated by a shared
+write-address decoder (not flip-flops, and not a synthesized ROM), so it
+can be rewritten after fabrication. Latches roughly halve the per-bit
+storage cost vs. flip-flops on this PDK, which is what lets the 16-word
+store fit in a 1x1 tile. To load a program:
 
 1. Hold `ui_in[7]` (`LOAD_EN`) high. This halts the core (PC forced to 0,
    `X` cleared) so it can't execute half-written instructions.
-2. For each instruction word, shift an 18-bit frame MSB-first into
+2. For each instruction word, shift a 17-bit frame MSB-first into
    `ui_in[5]` (`LOAD_DATA`), toggling `ui_in[6]` (`LOAD_CLK`) once per bit
    (rising-edge sampled, internally double-flopped for metastability):
-   - bits `[17:13]` — 5-bit address
+   - bits `[16:13]` — 4-bit address
    - bits `[12:0]`  — 13-bit instruction
 3. Frames can be sent in any order and re-sent to patch a single word;
    `LOAD_EN` can stay high across many frames.

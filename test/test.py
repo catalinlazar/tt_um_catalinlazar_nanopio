@@ -7,19 +7,24 @@ LOAD_EN   = 1 << 7
 LOAD_CLK  = 1 << 6
 LOAD_DATA = 1 << 5
 
+AWIDTH = 4   # matches nanopio_progmem's AWIDTH in tt_um_catalinlazar_nanopio.v
+WWIDTH = 13  # instruction word width
+FRAME_BITS = AWIDTH + WWIDTH
+
 
 async def load_program(dut, words):
     """Bit-bang `words` (list of 13-bit ints, index = address) into progmem
     over ui_in using the nanopio_loader protocol: LOAD_EN held high, then
-    for each frame shift addr(5)+instr(13)=18 bits MSB-first, toggling
-    LOAD_CLK once per bit and holding LOAD_DATA stable around the edge."""
+    for each frame shift addr(AWIDTH)+instr(WWIDTH)=FRAME_BITS bits
+    MSB-first, toggling LOAD_CLK once per bit and holding LOAD_DATA stable
+    around the edge."""
 
     dut.ui_in.value = LOAD_EN
     await ClockCycles(dut.clk, 2)
 
     for addr, instr in enumerate(words):
-        frame = (addr << 13) | (instr & 0x1FFF)
-        for i in range(17, -1, -1):
+        frame = (addr << WWIDTH) | (instr & 0x1FFF)
+        for i in range(FRAME_BITS - 1, -1, -1):
             bit = (frame >> i) & 1
             data_bit = LOAD_DATA if bit else 0
 

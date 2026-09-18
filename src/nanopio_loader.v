@@ -13,7 +13,7 @@
 // for as long as load_en stays high; any address can be rewritten at will.
 // Dropping load_en resets the bit counter (a partial frame is discarded).
 module nanopio_loader #(
-    parameter AWIDTH = 5,
+    parameter AWIDTH = 4,
     parameter WWIDTH = 13
 ) (
     input  wire                  clk,

@@ -30,6 +30,11 @@ import sys
 OPCODES = {"JMP": 0b000, "WAIT": 0b001, "IN": 0b010, "OUT": 0b011, "SET": 0b100}
 JMP_COND = {"ALWAYS": 0b00, "X==0": 0b01, "X!=0": 0b10, "DEC": 0b11}
 
+AWIDTH = 4   # matches nanopio_progmem's AWIDTH in tt_um_catalinlazar_nanopio.v
+WWIDTH = 13  # instruction word width
+DEPTH = 1 << AWIDTH
+ADDR_MASK = DEPTH - 1
+
 LINE_RE = re.compile(r"[;#].*$")
 DELAY_RE = re.compile(r"\[(\d+)\]\s*$")
 
@@ -108,9 +113,11 @@ def assemble(text):
             if target not in labels:
                 raise ValueError(f"line {lineno}: unknown label {target}")
             addr_bits = labels[target]
-            if not (0 <= addr_bits <= 31):
-                raise ValueError(f"line {lineno}: jump target out of range 0-31")
-            operand = (JMP_COND[cond] << 5) | (addr_bits & 0x1F)
+            if not (0 <= addr_bits <= ADDR_MASK):
+                raise ValueError(
+                    f"line {lineno}: jump target out of range 0-{ADDR_MASK}"
+                )
+            operand = (JMP_COND[cond] << 5) | (addr_bits & ADDR_MASK)
             opcode = OPCODES["JMP"]
 
         else:
@@ -118,6 +125,11 @@ def assemble(text):
 
         instr = (opcode << 10) | (delay << 7) | operand
         words.append(instr)
+
+    if len(words) > DEPTH:
+        raise ValueError(
+            f"program has {len(words)} instructions, exceeds progmem depth {DEPTH}"
+        )
 
     return words
 
@@ -128,11 +140,12 @@ def print_listing(words):
 
 
 def print_frames(words):
-    # Each frame: addr(5 bits) + instr(13 bits), MSB first, as sent over
-    # ui_in[5] (data) clocked by ui_in[6] while ui_in[7]=1.
+    # Each frame: addr(AWIDTH bits) + instr(WWIDTH bits), MSB first, as
+    # sent over ui_in[5] (data) clocked by ui_in[6] while ui_in[7]=1.
+    frame_bits = AWIDTH + WWIDTH
     for addr, w in enumerate(words):
-        frame = (addr << 13) | w
-        bits = format(frame, "018b")
+        frame = (addr << WWIDTH) | w
+        bits = format(frame, f"0{frame_bits}b")
         print(f"addr {addr:2d} -> frame bits (MSB first): {bits}")
 
 

@@ -23,9 +23,9 @@ module tt_um_catalinlazar_nanopio (
     input  wire       rst_n
 );
 
-    localparam AWIDTH = 5;   // log2(32) -- instruction memory depth
+    localparam AWIDTH = 4;   // log2(16) -- instruction memory depth
     localparam WWIDTH = 13;  // instruction word width
-    localparam DEPTH  = 32;
+    localparam DEPTH  = 16;
 
     wire load_en   = ui_in[7];
     wire load_clk  = ui_in[6];
@@ -61,7 +61,6 @@ module tt_um_catalinlazar_nanopio (
         .AWIDTH (AWIDTH),
         .WWIDTH (WWIDTH)
     ) u_progmem (
-        .clk   (clk),
         .we    (loader_we),
         .waddr (loader_waddr),
         .wdata (loader_wdata),

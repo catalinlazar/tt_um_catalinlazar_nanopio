@@ -2,7 +2,7 @@
 
 A tiny, reprogrammable programmable-I/O engine for [Tiny Tapeout](https://tinytapeout.com),
 inspired by the RP2040's PIO block. It's a small Harvard-core state machine
-that runs a 5-instruction ISA out of a 32-word instruction memory, meant for
+that runs a 5-instruction ISA out of a 16-word instruction memory, meant for
 bit-banging simple protocol timing (UART/SPI/I2C) after fabrication.
 
 - [ISA & datapath overview](docs/info.md)
