@@ -1,5 +1,6 @@
 .DS_Store
 .idea
+tt
 *.vcd
 *.fst
 *.fst.hier
